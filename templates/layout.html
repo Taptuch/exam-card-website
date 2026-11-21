@@ -1,0 +1,110 @@
+{% extends "base.html" %}
+{% block head %}<meta name="csrf" content="{{ csrf_token() }}">{% endblock %}
+{% block body_class %}app{% endblock %}
+
+{% block body %}
+<header class="topbar">
+  {% block topbar_left %}{% endblock %}
+  <a class="brand" href="{{ url_for('home') }}">Exam Cards</a>
+  <div class="spacer"></div>
+
+  <div class="userbox">
+    <div class="status-wrap">
+      <button type="button" id="status-btn" class="status-btn" aria-haspopup="true" aria-expanded="false" aria-controls="status-menu" aria-label="{{ t('top.status') }}" title="{{ t('top.status') }}">
+        <span id="user-avatar" class="avatar"></span><span id="user-dot" class="sdot online"></span>
+      </button>
+      <div id="status-menu" class="status-menu" hidden>
+        <ul class="status-options">
+          <li><button type="button" class="status-opt" data-status="online"><span class="sdot online"></span>{{ t('status.online') }}</button></li>
+          <li><button type="button" class="status-opt" data-status="idle"><span class="sdot idle"></span>{{ t('status.idle') }}</button></li>
+          <li><button type="button" class="status-opt" data-status="dnd"><span class="sdot dnd"></span>{{ t('status.dnd') }}</button></li>
+          <li><button type="button" class="status-opt" data-status="invisible"><span class="sdot invisible"></span><span>{{ t('status.invisible') }}<small>{{ t('status.invisible_desc') }}</small></span></button></li>
+        </ul>
+        <form id="status-form" class="status-custom">
+          <label for="status-text">{{ t('status.custom') }}</label>
+          <input id="status-text" type="text" maxlength="60" placeholder="{{ t('status.placeholder') }}" autocomplete="off">
+          <div class="row">
+            <button type="submit" class="btn small primary">{{ t('status.save') }}</button>
+            <button type="button" id="status-clear" class="btn small ghost">{{ t('status.clear') }}</button>
+          </div>
+        </form>
+      </div>
+    </div>
+    <span class="welcome">{{ t('top.welcome') }} <strong id="user-name">{{ g.user.display_name }}</strong></span>
+
+    <div id="lang-switch" class="seg" role="group" aria-label="{{ t('top.language') }}">
+      {% for code in LANGS %}
+        <button type="button" data-lang="{{ code }}" aria-pressed="{{ 'true' if code == lang else 'false' }}" lang="{{ code }}">{{ LANG_LABELS[code] }}</button>
+      {% endfor %}
+    </div>
+    {% if g.user.is_admin %}<a class="btn small" href="{{ url_for('admin_page') }}">{{ t('top.admin') }}</a>{% endif %}
+    <button type="button" id="open-settings" class="btn small">⚙ {{ t('top.settings') }}</button>
+    <form method="post" action="{{ url_for('logout') }}" class="inline">
+      <input type="hidden" name="csrf" value="{{ csrf_token() }}">
+      <button type="submit" class="btn small ghost">{{ t('top.signout') }}</button>
+    </form>
+  </div>
+</header>
+
+{% block content %}{% endblock %}
+
+<!-- online bookmark (bottom right) -->
+<aside id="presence" class="presence" aria-label="{{ t('presence.title') }}">
+  <div id="presence-panel" class="presence-panel" aria-hidden="true">
+    <h3>{{ t('presence.title') }}</h3>
+    <ul id="presence-list"></ul>
+  </div>
+  <button type="button" id="presence-tab" class="presence-tab" aria-expanded="false" aria-controls="presence-panel">
+    <span class="dot"></span><span id="presence-count">–</span> {{ t('presence.online') }}
+  </button>
+</aside>
+
+<!-- settings dialog -->
+<dialog id="settings-dialog" class="modal">
+  <div class="modal-head">
+    <h2>{{ t('set.title') }}</h2>
+    <button type="button" class="icon-btn" data-close aria-label="{{ t('set.close') }}">✕</button>
+  </div>
+
+  <section>
+    <h3>{{ t('set.picture') }}</h3>
+    <div class="row">
+      <span id="settings-avatar" class="avatar big"></span>
+      <form id="avatar-form" class="grow">
+        <input type="file" id="avatar-file" accept=".png,.jpg,.jpeg,.gif,image/png,image/jpeg,image/gif" required>
+        <div class="row">
+          <button type="submit" class="btn small primary">{{ t('set.upload') }}</button>
+          <button type="button" id="avatar-remove" class="btn small ghost">{{ t('set.remove') }}</button>
+        </div>
+      </form>
+    </div>
+    <p class="hint">{{ t('set.picture_hint') }}</p>
+    <p class="status" id="avatar-status" role="status"></p>
+  </section>
+
+  <section>
+    <h3>{{ t('set.nickname') }}</h3>
+    <form id="name-form" class="row">
+      <input id="name-input" type="text" maxlength="30" required class="grow" aria-label="{{ t('set.nickname') }}">
+      <button type="submit" class="btn small primary">{{ t('set.save') }}</button>
+    </form>
+    <p class="status" id="name-status" role="status"></p>
+  </section>
+
+  <section>
+    <h3>{{ t('set.password') }}</h3>
+    <form id="password-form" class="stack-form">
+      <input id="pw-current" type="password" placeholder="{{ t('set.pw_current') }}" autocomplete="current-password" required>
+      <input id="pw-new" type="password" placeholder="{{ t('set.pw_new', n=8) }}" autocomplete="new-password" minlength="8" required>
+      <input id="pw-confirm" type="password" placeholder="{{ t('set.pw_repeat') }}" autocomplete="new-password" required>
+      <button type="submit" class="btn small primary">{{ t('set.pw_change') }}</button>
+    </form>
+    <p class="status" id="password-status" role="status"></p>
+  </section>
+</dialog>
+
+<!-- translations for the scripts (a data block: not executed, so it is fine under the CSP) -->
+<script type="application/json" id="i18n-data">{{ i18n_strings|tojson }}</script>
+<script src="{{ url_for('static', filename='common.js') }}" defer></script>
+{% block scripts %}{% endblock %}
+{% endblock %}

@@ -1,0 +1,129 @@
+{% extends "layout.html" %}
+{% block title %}{{ t('admin.title') }} · Exam Cards{% endblock %}
+
+{% block topbar_left %}
+<a class="btn small ghost" href="{{ url_for('home') }}">{{ t('admin.back') }}</a>
+{% endblock %}
+
+{% block content %}
+<main class="main admin">
+  <h1>{{ t('admin.title') }}</h1>
+  <div class="tabs" role="tablist">
+    <button type="button" class="tab active" data-tab="users" role="tab">{{ t('admin.tab_users') }}</button>
+    <button type="button" class="tab" data-tab="subjects" role="tab">{{ t('admin.tab_subjects') }}</button>
+  </div>
+
+  <section id="tab-users">
+    <div class="row between">
+      <p class="muted" id="users-summary"></p>
+      <button type="button" id="new-user" class="btn primary">{{ t('admin.new_user') }}</button>
+    </div>
+    <div class="table-wrap">
+      <table class="table">
+        <thead><tr><th>{{ t('admin.col_user') }}</th><th>{{ t('admin.col_role') }}</th><th>{{ t('admin.col_status') }}</th><th>{{ t('admin.col_seen') }}</th><th></th></tr></thead>
+        <tbody id="users-body"></tbody>
+      </table>
+    </div>
+  </section>
+
+  <section id="tab-subjects" hidden>
+    <div class="row between">
+      <p class="muted">{{ t('admin.subjects_hint') }}</p>
+      <button type="button" id="new-subject" class="btn primary">{{ t('admin.new_subject') }}</button>
+    </div>
+    <div class="table-wrap">
+      <table class="table">
+        <thead><tr><th>{{ t('admin.col_subject') }}</th><th>{{ t('admin.col_id') }}</th><th>{{ t('admin.col_cards') }}</th><th></th></tr></thead>
+        <tbody id="subjects-body"></tbody>
+      </table>
+    </div>
+  </section>
+</main>
+
+<!-- create / edit user -->
+<dialog id="user-dialog" class="modal">
+  <form id="user-form" class="stack-form">
+    <div class="modal-head">
+      <h2 id="user-dialog-title">{{ t('admin.new_user_title') }}</h2>
+      <button type="button" class="icon-btn" data-close aria-label="{{ t('set.close') }}">✕</button>
+    </div>
+    <label>{{ t('admin.f_username') }}
+      <input id="uf-username" type="text" maxlength="32" autocomplete="off" required>
+    </label>
+    <label>{{ t('admin.f_nickname') }}
+      <input id="uf-name" type="text" maxlength="30" autocomplete="off">
+    </label>
+    <label id="uf-password-row">{{ t('admin.f_temp') }}
+      <span class="row">
+        <input id="uf-password" type="text" minlength="8" autocomplete="off" class="grow mono">
+        <button type="button" id="uf-generate" class="btn small">{{ t('admin.generate') }}</button>
+      </span>
+      <small class="hint">{{ t('admin.temp_hint') }}</small>
+    </label>
+    <label class="check"><input id="uf-admin" type="checkbox"> {{ t('admin.f_admin') }}</label>
+    <p class="status error" id="user-form-error" role="alert"></p>
+    <div class="row end">
+      <button type="button" class="btn ghost" data-close>{{ t('admin.cancel') }}</button>
+      <button type="submit" class="btn primary">{{ t('admin.save') }}</button>
+    </div>
+  </form>
+</dialog>
+
+<!-- show a freshly generated temporary password -->
+<dialog id="password-dialog" class="modal">
+  <div class="modal-head">
+    <h2>{{ t('admin.temp_title') }}</h2>
+    <button type="button" class="icon-btn" data-close aria-label="{{ t('set.close') }}">✕</button>
+  </div>
+  <p id="pd-text"></p>
+  <p class="secret"><code id="pd-password"></code></p>
+  <div class="row end">
+    <button type="button" id="pd-copy" class="btn">{{ t('admin.copy') }}</button>
+    <button type="button" class="btn primary" data-close>{{ t('admin.done') }}</button>
+  </div>
+</dialog>
+
+<!-- subject JSON editor -->
+<dialog id="subject-dialog" class="modal wide">
+  <form id="subject-form" class="stack-form">
+    <div class="modal-head">
+      <h2 id="sd-title"></h2>
+      <button type="button" class="icon-btn" data-close aria-label="{{ t('set.close') }}">✕</button>
+    </div>
+    <details>
+      <summary>{{ t('admin.format_help') }}</summary>
+      <p class="hint">{{ t('admin.format_text') }}</p>
+    </details>
+    <textarea id="sd-text" class="code" spellcheck="false" rows="22" aria-label="{{ t('admin.json_label') }}"></textarea>
+    <ul id="sd-problems" class="problems" role="alert"></ul>
+    <div class="row end">
+      <button type="button" class="btn ghost" data-close>{{ t('admin.cancel') }}</button>
+      <button type="submit" class="btn primary">{{ t('admin.save') }}</button>
+    </div>
+  </form>
+</dialog>
+
+<!-- new subject -->
+<dialog id="newsubject-dialog" class="modal">
+  <form id="newsubject-form" class="stack-form">
+    <div class="modal-head">
+      <h2>{{ t('admin.new_subject_title') }}</h2>
+      <button type="button" class="icon-btn" data-close aria-label="{{ t('set.close') }}">✕</button>
+    </div>
+    <label>{{ t('admin.f_title') }}
+      <input id="ns-title" type="text" maxlength="80" required>
+    </label>
+    <label>{{ t('admin.f_id') }}
+      <input id="ns-id" type="text" maxlength="40" pattern="[a-z0-9][a-z0-9_\-]*" required class="mono">
+      <small class="hint">{{ t('admin.id_hint') }}</small>
+    </label>
+    <p class="status error" id="ns-error" role="alert"></p>
+    <div class="row end">
+      <button type="button" class="btn ghost" data-close>{{ t('admin.cancel') }}</button>
+      <button type="submit" class="btn primary">{{ t('admin.create') }}</button>
+    </div>
+  </form>
+</dialog>
+{% endblock %}
+
+{% block scripts %}<script src="{{ url_for('static', filename='admin.js') }}" defer></script>{% endblock %}

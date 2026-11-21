@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+{% block title %}{{ t('login.title') }} · Exam Cards{% endblock %}
+
+{% block body %}
+<main class="center">
+  {% set next_page = 'login' %}{% include "_lang_form.html" %}
+
+  <div class="stack" aria-hidden="true">
+    <span class="ghost-card g2"></span>
+    <span class="ghost-card g1"></span>
+  </div>
+
+  <section class="card">
+    <h1>Exam Cards</h1>
+    <p class="muted">{{ t('login.subtitle') }}</p>
+
+    {% if error %}
+      <div class="alert" role="alert">{{ error }}</div>
+    {% endif %}
+
+    <form method="post" action="{{ url_for('login') }}" autocomplete="on">
+      <input type="hidden" name="csrf" value="{{ csrf_token() }}">
+
+      <label for="username">{{ t('login.username') }}</label>
+      <input id="username" name="username" type="text" value="{{ username }}"
+             autocomplete="username" autocapitalize="none" spellcheck="false"
+             maxlength="64" required {% if not username %}autofocus{% endif %}>
+
+      <label for="password">{{ t('login.password') }}</label>
+      <input id="password" name="password" type="password"
+             autocomplete="current-password" maxlength="256" required
+             {% if username %}autofocus{% endif %}>
+
+      <label class="check">
+        <input type="checkbox" name="remember"> {{ t('login.remember') }}
+      </label>
+
+      <button type="submit">{{ t('login.submit') }}</button>
+    </form>
+  </section>
+</main>
+{% endblock %}

@@ -1,0 +1,16 @@
+# /etc/systemd/system/examcards-backup.service  (started by examcards-backup.timer)
+[Unit]
+Description=Exam Cards - database backup
+
+[Service]
+Type=oneshot
+User=examcards
+Group=examcards
+WorkingDirectory=/opt/examcards/app
+EnvironmentFile=/etc/examcards.env
+ExecStart=/opt/examcards/venv/bin/python backup_db.py
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=true
+ReadWritePaths=/var/lib/examcards

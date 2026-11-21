@@ -1,0 +1,12 @@
+# /etc/systemd/system/examcards-backup.timer  - runs the backup every night at 03:15
+[Unit]
+Description=Exam Cards - nightly database backup
+
+[Timer]
+OnCalendar=*-*-* 03:15:00
+# if the server was off at 03:15, run the backup right after boot
+Persistent=true
+RandomizedDelaySec=300
+
+[Install]
+WantedBy=timers.target

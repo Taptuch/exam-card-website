@@ -1,0 +1,31 @@
+# /etc/systemd/system/examcards.service
+[Unit]
+Description=Exam Cards
+After=network.target
+
+[Service]
+User=examcards
+Group=examcards
+WorkingDirectory=/opt/examcards/app
+EnvironmentFile=/etc/examcards.env
+
+# create / upgrade the database before the workers start
+ExecStartPre=/opt/examcards/venv/bin/python -c "import db; db.init_db()"
+ExecStart=/opt/examcards/venv/bin/gunicorn --workers 3 --bind 127.0.0.1:8000 \
+          --access-logfile - --error-logfile - --timeout 30 wsgi:app
+
+Restart=on-failure
+RestartSec=3
+
+# hardening: the service may only write to /var/lib/examcards
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=true
+ReadWritePaths=/var/lib/examcards
+ProtectKernelTunables=true
+ProtectControlGroups=true
+RestrictSUIDSGID=true
+
+[Install]
+WantedBy=multi-user.target

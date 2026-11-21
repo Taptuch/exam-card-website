@@ -1,0 +1,23 @@
+{% extends "layout.html" %}
+{% block title %}Exam Cards{% endblock %}
+
+{% block topbar_left %}
+<button type="button" id="sidebar-toggle" class="icon-btn" aria-label="{{ t('top.toggle_subjects') }}" aria-controls="sidebar" aria-expanded="true">☰</button>
+{% endblock %}
+
+{% block content %}
+<div class="layout">
+  <aside id="sidebar" class="sidebar" aria-label="{{ t('side.subjects') }}">
+    <a id="flagged-link" class="subject-link flagged-link" href="#/flagged">
+      <span class="s-title">⚑ {{ t('flagged.title') }}</span><small id="flagged-count"></small>
+    </a>
+    <h2>{{ t('side.subjects') }}</h2>
+    <nav id="subject-list"></nav>
+  </aside>
+  <main id="main" class="main" tabindex="-1">
+    <p class="muted">…</p>
+  </main>
+</div>
+{% endblock %}
+
+{% block scripts %}<script src="{{ url_for('static', filename='app.js') }}" defer></script>{% endblock %}
